@@ -71,6 +71,10 @@ export function registerUser(accountIdentifier: string, password: string, passwo
   }).then(saveAuthToken);
 }
 
+export function startGuestSession() {
+  return request<AuthResponse>("/api/auth/guest", { method: "POST" }).then(saveAuthToken);
+}
+
 export function logoutUser() {
   return request<{ ok: boolean }>("/api/auth/logout", { method: "POST" }).finally(() => localStorage.removeItem(SESSION_TOKEN_KEY));
 }

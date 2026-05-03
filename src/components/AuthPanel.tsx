@@ -10,12 +10,13 @@ type Props = {
   notice: string;
   onLogin: (accountIdentifier: string, password: string) => void;
   onRegister: (accountIdentifier: string, password: string, passwordConfirmation: string, displayName: string) => void;
+  onGuest: () => void;
   onRequestPasswordReset: (accountIdentifier: string) => void;
   onResetPassword: (token: string, password: string, passwordConfirmation: string) => void;
   onLanguageChange: (language: WorkspaceLanguage) => void;
 };
 
-export function AuthPanel({ busy, connection, error, labels, language, notice, onLogin, onRegister, onRequestPasswordReset, onResetPassword, onLanguageChange }: Props) {
+export function AuthPanel({ busy, connection, error, labels, language, notice, onLogin, onRegister, onGuest, onRequestPasswordReset, onResetPassword, onLanguageChange }: Props) {
   const [mode, setMode] = useState<"login" | "register" | "forgot" | "reset">("login");
   const [accountIdentifier, setAccountIdentifier] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -157,6 +158,14 @@ export function AuthPanel({ busy, connection, error, labels, language, notice, o
           <button type="submit" className="btn-auth" disabled={disabled}>
             {busy ? "Working..." : registering ? labels.createAccount : forgot ? labels.requestReset : resetting ? labels.resetPassword : labels.signIn}
           </button>
+          {mode === "login" ? (
+            <>
+              <button type="button" className="auth-switch" disabled={disabled || Boolean(busy)} onClick={onGuest}>
+                {busy === "starting-guest" ? "Working..." : labels.continueAsGuest}
+              </button>
+              <p className="auth-note">{labels.guestAuthNote}</p>
+            </>
+          ) : null}
         </form>
 
         <div className="auth-switch-row">

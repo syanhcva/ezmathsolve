@@ -13,6 +13,7 @@ import {
   resetPassword,
   retryJob,
   solveRun,
+  startGuestSession,
   uploadWorksheet,
 } from "./api";
 import { actionState, authNoticeText, connectionMessage, currentMode, hasActiveJobs, labelsFor, noticeText, reviewCards } from "./state";
@@ -358,6 +359,26 @@ export default function App() {
     }
   }
 
+  async function handleGuest() {
+    setError("");
+    setNotice("");
+    setAuthBusy("starting-guest");
+    try {
+      const data = await startGuestSession();
+      resetWorkspace();
+      setUser(data.user);
+      setAuthMode("signed-in");
+      setConnection("connected");
+      setNotice(data.message || labels.guestWorkspaceNotice);
+      await refreshHistory();
+    } catch (caught) {
+      setConnection(caught instanceof TypeError ? "unreachable" : "error");
+      setError(readableError(caught, "Guest access could not be started."));
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
   async function handleLogout() {
     setError("");
     setNotice("");
@@ -615,6 +636,7 @@ export default function App() {
         onRegister={(accountIdentifier, password, passwordConfirmation, displayName) =>
           handleRegister(accountIdentifier, password, passwordConfirmation, displayName).catch((caught: Error) => setError(caught.message))
         }
+        onGuest={() => handleGuest().catch((caught: Error) => setError(caught.message))}
         onRequestPasswordReset={(accountIdentifier) => handleRequestPasswordReset(accountIdentifier).catch((caught: Error) => setError(caught.message))}
         onResetPassword={(token, password, passwordConfirmation) => handleResetPassword(token, password, passwordConfirmation).catch((caught: Error) => setError(caught.message))}
         onLanguageChange={setLanguage}
@@ -647,7 +669,7 @@ export default function App() {
           onRetryFailed={failedJob ? () => handleRetryFailedJob().catch((caught: Error) => setError(caught.message)) : undefined}
         />
 
-        <NoticeBar text={error || notice || (!user.email_confirmed ? labels.emailUnconfirmed : "") || connectionMessage(connection) || noticeText(mode, language, run)} error={Boolean(error)} mode={mode} connection={connection} />
+        <NoticeBar text={error || notice || (user.is_guest ? labels.guestWorkspaceNotice : !user.email_confirmed ? labels.emailUnconfirmed : "") || connectionMessage(connection) || noticeText(mode, language, run)} error={Boolean(error)} mode={mode} connection={connection} />
 
         <section className={`content ${run ? "" : "upload-only"} ${mode === "uploaded" ? "image-only" : ""}`}>
           {run ? (

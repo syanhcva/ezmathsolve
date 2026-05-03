@@ -110,7 +110,7 @@ export function HistoryPanel({
           <div className="sidebar-user-chip" title={user.account_identifier}>
             <span>{user.display_name}</span>
             <button type="button" onClick={onLogout}>
-              {labels.signOut}
+              {user.is_guest ? labels.signIn : labels.signOut}
             </button>
           </div>
         </div>

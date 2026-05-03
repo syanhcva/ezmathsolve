@@ -4,7 +4,7 @@ export type BusyMode = "uploading" | "converting" | "solving" | "loading-history
 export type ReadIntentStatus = "idle" | "waiting-for-upload";
 export type ConnectionState = "unknown" | "connected" | "unreachable" | "error";
 export type AuthMode = "checking" | "signed-out" | "signed-in";
-export type AuthBusyMode = "signing-in" | "registering" | "signing-out" | "requesting-reset" | "resetting-password" | "resending-confirmation" | "confirming-email" | false;
+export type AuthBusyMode = "signing-in" | "registering" | "signing-out" | "starting-guest" | "requesting-reset" | "resetting-password" | "resending-confirmation" | "confirming-email" | false;
 export type WorkspaceLanguage = "vi" | "en";
 export type ReviewAnswerState = "none" | "pending" | "solved" | "failed";
 export type JobStatus = "queued" | "running" | "completed" | "failed" | "canceled";
@@ -15,6 +15,7 @@ export type User = {
   account_identifier: string;
   display_name: string;
   email_confirmed: boolean;
+  is_guest: boolean;
 };
 
 export type AuthResponse = {
@@ -285,6 +286,9 @@ export type ChromeLabels = {
   authNote: string;
   createAccount: string;
   signIn: string;
+  continueAsGuest: string;
+  guestAuthNote: string;
+  guestWorkspaceNotice: string;
   alreadyHaveAccount: string;
   createNewAccount: string;
 };
